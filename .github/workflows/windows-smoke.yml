@@ -56,8 +56,11 @@ jobs:
         run: |
           $env:SHINY_PORT = "7878"
           $rdir = $env:APP_DIR -replace '\\','/'
+          # Capture R's own stdout/stderr — Start-Process runs detached, so
+          # without redirection any R startup error would be invisible.
           $proc = Start-Process -PassThru -FilePath "Rscript" `
-            -ArgumentList @("--vanilla","-e","setwd('$rdir'); source('run_app.R', echo=FALSE)")
+            -ArgumentList @("--vanilla","-e","setwd('$rdir'); source('run_app.R', echo=FALSE)") `
+            -RedirectStandardOutput "r_out.log" -RedirectStandardError "r_err.log"
           $ok = $false
           for ($i = 0; $i -lt 60; $i++) {
             if ($proc.HasExited) { break }
@@ -71,5 +74,10 @@ jobs:
           Get-CimInstance Win32_Process |
             Where-Object { $_.CommandLine -like "*run_app.R*" } |
             ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
+          Write-Host "==================== R stdout ===================="
+          if (Test-Path r_out.log) { Get-Content r_out.log }
+          Write-Host "==================== R stderr ===================="
+          if (Test-Path r_err.log) { Get-Content r_err.log }
+          Write-Host "================================================="
           if (-not $ok) { throw "La app no sirvio HTTP 200 en el puerto 7878 dentro del tiempo limite" }
           Write-Host "OK: Nexus SR arranco y sirvio HTTP 200 en Windows real."
