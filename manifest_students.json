@@ -1,6 +1,10 @@
 {
-  "latest_version": "v0.9.1",
-  "download_url": "https://example.com/NexusSR_Students_mac_v0.9.1.zip",
-  "release_url": "https://example.com/nexus/releases/v0.9.1.html",
-  "release_notes": "<ul><li>Primera versión para estudiantes (v0.9.1)</li></ul>"
+  "latest_version": "1.0.0",
+  "download_url": "https://github.com/ikerugr/nexus-updates/releases/tag/v1.0.0",
+  "release_url": "https://github.com/ikerugr/nexus-updates/releases/tag/v1.0.0",
+  "release_notes": "<ul><li>Primera versión estable para estudiantes.</li></ul>",
+  "download_mac": "https://github.com/ikerugr/nexus-updates/releases/download/v1.0.0/NexusSR-v1.0.0-mac.zip",
+  "download_win": "https://github.com/ikerugr/nexus-updates/releases/download/v1.0.0/NexusSR-v1.0.0-win.zip",
+  "sha256_mac": "dbd0a8bc26bf30c901fe9c16056e464a0748f0c25281c434f7ece0b59582e452",
+  "sha256_win": "e06989620d99e2db5f28093b8bec87c0c3f77ce90396acddca6348505a506efc"
 }
