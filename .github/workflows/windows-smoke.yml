@@ -1,0 +1,75 @@
+# Windows smoke test para Nexus SR.
+# Este fichero se DESPLIEGA en el repo ikerugr/nexus-updates, en la ruta
+#   .github/workflows/windows-smoke.yml
+# (este proyecto no tiene remoto, así que esta copia es solo la fuente de verdad
+#  para editarlo; el que se ejecuta vive en nexus-updates).
+#
+# Qué hace: en una máquina Windows REAL de GitHub, descarga el último paquete
+# -win.zip publicado, instala R, instala los paquetes como en el primer arranque
+# de un alumno, levanta la app y comprueba que sirve HTTP 200. Es la verificación
+# de Windows que no se puede hacer en un Mac.
+#
+# Cómo lanzarlo: en github.com/ikerugr/nexus-updates > pestaña Actions >
+# "Windows smoke test" > Run workflow. También se ejecuta solo al publicar
+# cada release.
+name: Windows smoke test
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: 'release'
+
+      - name: Set up pandoc
+        uses: r-lib/actions/setup-pandoc@v2
+
+      - name: Download latest Windows bundle
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          New-Item -ItemType Directory -Force -Path bundle | Out-Null
+          gh release download --repo ${{ github.repository }} --pattern "NexusSR-*-win.zip" --dir bundle
+          $zip = (Get-ChildItem bundle\*.zip)[0].FullName
+          Expand-Archive -Path $zip -DestinationPath app -Force
+          $appDir = (Get-ChildItem app -Directory)[0].FullName
+          "APP_DIR=$appDir" | Out-File -FilePath $env:GITHUB_ENV -Append
+          Write-Host "Bundle extraido en: $appDir"
+
+      - name: Install app R packages (first-run path)
+        shell: pwsh
+        run: |
+          Rscript --vanilla "$env:APP_DIR\install_core_packages.R"
+          if ($LASTEXITCODE -ne 0) { throw "La instalacion de paquetes fallo (exit $LASTEXITCODE)" }
+
+      - name: Boot the app and check it serves HTTP 200
+        shell: pwsh
+        run: |
+          $env:SHINY_PORT = "7878"
+          $rdir = $env:APP_DIR -replace '\\','/'
+          $proc = Start-Process -PassThru -FilePath "Rscript" `
+            -ArgumentList @("--vanilla","-e","setwd('$rdir'); source('run_app.R', echo=FALSE)")
+          $ok = $false
+          for ($i = 0; $i -lt 60; $i++) {
+            if ($proc.HasExited) { break }
+            try {
+              $r = Invoke-WebRequest -UseBasicParsing -TimeoutSec 2 "http://127.0.0.1:7878"
+              if ($r.StatusCode -eq 200) { $ok = $true; break }
+            } catch {}
+            Start-Sleep -Seconds 5
+          }
+          try { Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue } catch {}
+          Get-CimInstance Win32_Process |
+            Where-Object { $_.CommandLine -like "*run_app.R*" } |
+            ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
+          if (-not $ok) { throw "La app no sirvio HTTP 200 en el puerto 7878 dentro del tiempo limite" }
+          Write-Host "OK: Nexus SR arranco y sirvio HTTP 200 en Windows real."
