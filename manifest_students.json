@@ -1,10 +1,10 @@
 {
-  "latest_version": "1.0.0",
-  "download_url": "https://github.com/ikerugr/nexus-updates/releases/tag/v1.0.0",
-  "release_url": "https://github.com/ikerugr/nexus-updates/releases/tag/v1.0.0",
+  "latest_version": "1.0.1",
+  "download_url": "https://github.com/ikerugr/nexus-updates/releases/tag/v1.0.1",
+  "release_url": "https://github.com/ikerugr/nexus-updates/releases/tag/v1.0.1",
   "release_notes": "<ul><li>Primera versión estable para estudiantes.</li></ul>",
-  "download_mac": "https://github.com/ikerugr/nexus-updates/releases/download/v1.0.0/NexusSR-v1.0.0-mac.zip",
-  "download_win": "https://github.com/ikerugr/nexus-updates/releases/download/v1.0.0/NexusSR-v1.0.0-win.zip",
-  "sha256_mac": "dbd0a8bc26bf30c901fe9c16056e464a0748f0c25281c434f7ece0b59582e452",
-  "sha256_win": "e06989620d99e2db5f28093b8bec87c0c3f77ce90396acddca6348505a506efc"
+  "download_mac": "https://github.com/ikerugr/nexus-updates/releases/download/v1.0.1/NexusSR-v1.0.1-mac.zip",
+  "download_win": "https://github.com/ikerugr/nexus-updates/releases/download/v1.0.1/NexusSR-v1.0.1-win.zip",
+  "sha256_mac": "23773322a1285ee0632e85b0eed2c62de2bbdbfb609868e786b1c5b6e78b93fd",
+  "sha256_win": "74870c17697b981e3063fb7c87969cb57194614586789b5665b921a1a00cfd5e"
 }
